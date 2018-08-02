@@ -1,27 +1,14 @@
 #:import random random.random
 
-ShowcaseScreen:
+Screen:
     name: 'TabbedPanel + Layouts'
     fullscreen: True
-    on_parent: if args[1] and tp.current_tab == tab_fl: app.showcase_floatlayout(fl)
+    on_parent: if args[1] and tp.current_tab == grid: app.showcase_gridlayout(fl)
 
     TabbedPanel:
         id: tp
         do_default_tab: False
 
-        TabbedPanelItem:
-            id: tab_fl
-            text: 'FloatLayout'
-            on_release: app.showcase_floatlayout(fl)
-            FloatLayout:
-                CFloatLayout:
-                    id: fl
-        TabbedPanelItem:
-            text: 'BoxLayout'
-            on_release: app.showcase_boxlayout(box)
-            FloatLayout
-                CBoxLayout:
-                    id: box
         TabbedPanelItem:
             text: 'GridLayout'
             on_release: app.showcase_gridlayout(grid)
@@ -29,12 +16,6 @@ ShowcaseScreen:
                 CGridLayout:
                     id: grid
                     rows: 3
-        TabbedPanelItem:
-            on_release: app.showcase_stacklayout(stack)
-            text: 'StackLayout'
-            FloatLayout
-                CStackLayout:
-                    id: stack
         TabbedPanelItem:
             text: 'AnchorLayout'
             on_release: app.showcase_anchorlayout(anchor)
@@ -51,10 +32,7 @@ ShowcaseScreen:
                             text: 'anchor_y: {}'.format(anchor.anchor_y)
                         Button
 
-<CFloatLayout@FloatLayout+BackgroundColor>
-<CBoxLayout@BoxLayout+BackgroundColor>
 <CGridLayout@GridLayout+BackgroundColor>
-<CStackLayout@StackLayout+BackgroundColor>
 <CAnchorLayout@AnchorLayout+BackgroundColor>
 
 

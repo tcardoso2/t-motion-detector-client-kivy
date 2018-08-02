@@ -1,6 +1,27 @@
 '''
-t-motion-detector-kivy-client
+Showcase of Kivy Features
 =========================
+
+This showcases many features of Kivy. You should see a
+menu bar across the top with a demonstration area below. The
+first demonstration is the accordion layout. You can see, but not
+edit, the kv language code for any screen by pressing the bug or
+'show source' icon. Scroll through the demonstrations using the
+left and right icons in the top right or selecting from the menu
+bar.
+
+The file showcase.kv describes the main container, while each demonstration
+pane is described in a separate .kv file in the data/screens directory.
+The image data/background.png provides the gradient background while the
+icons in data/icon directory are used in the control bar. The file
+data/faust_github.jpg is used in the Scatter pane. The icons are
+from `http://www.gentleface.com/free_icon_set.html` and licensed as
+Creative Commons - Attribution and Non-commercial Use Only; they
+sell a commercial license.
+
+The file android.txt is used to package the application for use with the
+Kivy Launcher Android application. For Android devices, you can
+copy/paste this directory into /sdcard/kivy/showcase on your Android device.
 
 '''
 
@@ -15,35 +36,39 @@ from kivy.animation import Animation
 from kivy.uix.screenmanager import Screen
 
 
-class MainScreen(Screen):
+class ShowcaseScreen(Screen):
     fullscreen = BooleanProperty(False)
 
     def add_widget(self, *args):
         if 'content' in self.ids:
             return self.ids.content.add_widget(*args)
-        return super(MainScreen, self).add_widget(*args)
+        return super(ShowcaseScreen, self).add_widget(*args)
 
 
-class MainApp(App):
+class ShowcaseApp(App):
 
     index = NumericProperty(-1)
+    current_title = StringProperty()
+    time = NumericProperty(0)
+    show_sourcecode = BooleanProperty(False)
     sourcecode = StringProperty()
     screen_names = ListProperty([])
-    current_title = StringProperty()
-    show_sourcecode = BooleanProperty(False)
-    hierarchy = StringProperty()
+    hierarchy = ListProperty([])
 
     def build(self):
         self.title = 't-motion-detector client'
         Clock.schedule_interval(self._update_clock, 1 / 60.)
         self.screens = {}
         self.available_screens = sorted([
-            'TabbedPanel + Layouts'])
+            'Buttons', 'ToggleButton', 'Sliders', 'ProgressBar', 'Switches',
+            'CheckBoxes', 'TextInputs', 'Accordions', 'FileChoosers',
+            'Carousel', 'Bubbles', 'CodeInput', 'DropDown', 'Spinner',
+            'Scatter', 'Splitter', 'TabbedPanel + Layouts', 'RstDocument',
+            'Popups', 'ScreenManager'])
         self.screen_names = self.available_screens
         curdir = dirname(__file__)
         self.available_screens = [join(curdir, 'data', 'screens',
             '{}.kv'.format(fn).lower()) for fn in self.available_screens]
-        self.index = (self.index + 1) % len(self.available_screens)
         self.go_next_screen()
 
     def on_pause(self):
@@ -117,6 +142,42 @@ class MainApp(App):
         self.root.ids.sourcecode.text = self.read_sourcecode()
         self.root.ids.sv.scroll_y = 1
 
+    def showcase_floatlayout(self, layout):
+
+        def add_button(*t):
+            if not layout.get_parent_window():
+                return
+            if len(layout.children) > 5:
+                layout.clear_widgets()
+            layout.add_widget(Builder.load_string('''
+#:import random random.random
+Button:
+    size_hint: random(), random()
+    pos_hint: {'x': random(), 'y': random()}
+    text:
+        'size_hint x: {} y: {}\\n pos_hint x: {} y: {}'.format(\
+            self.size_hint_x, self.size_hint_y, self.pos_hint['x'],\
+            self.pos_hint['y'])
+'''))
+            Clock.schedule_once(add_button, 1)
+        Clock.schedule_once(add_button)
+
+    def showcase_boxlayout(self, layout):
+
+        def add_button(*t):
+            if not layout.get_parent_window():
+                return
+            if len(layout.children) > 5:
+                layout.orientation = 'vertical'\
+                    if layout.orientation == 'horizontal' else 'horizontal'
+                layout.clear_widgets()
+            layout.add_widget(Builder.load_string('''
+Button:
+    text: self.parent.orientation if self.parent else ''
+'''))
+            Clock.schedule_once(add_button, 1)
+        Clock.schedule_once(add_button)
+
     def showcase_gridlayout(self, layout):
 
         def add_button(*t):
@@ -131,6 +192,27 @@ Button:
     text:
         'rows: {}\\ncols: {}'.format(self.parent.rows, self.parent.cols)\
         if self.parent else ''
+'''))
+            Clock.schedule_once(add_button, 1)
+        Clock.schedule_once(add_button)
+
+    def showcase_stacklayout(self, layout):
+        orientations = ('lr-tb', 'tb-lr',
+                        'rl-tb', 'tb-rl',
+                        'lr-bt', 'bt-lr',
+                        'rl-bt', 'bt-rl')
+
+        def add_button(*t):
+            if not layout.get_parent_window():
+                return
+            if len(layout.children) > 11:
+                layout.clear_widgets()
+                cur_orientation = orientations.index(layout.orientation)
+                layout.orientation = orientations[cur_orientation - 1]
+            layout.add_widget(Builder.load_string('''
+Button:
+    text: self.parent.orientation if self.parent else ''
+    size_hint: .2, .2
 '''))
             Clock.schedule_once(add_button, 1)
         Clock.schedule_once(add_button)
@@ -154,4 +236,4 @@ Button:
 
 
 if __name__ == '__main__':
-    MainApp().run()
+    ShowcaseApp().run()
